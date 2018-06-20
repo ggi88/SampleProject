@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <script language="javascript">
+        function DelMessage() {
+            window.status = 'delFunc_Message';
+            window.status = '';
+        }
+
+        function DelForm() {
+            window.status = 'delFunc_Form';
+            window.status = '';
+        }
+        function DelMainMessage() {
+            window.status = 'delFunc_MainMessage';
+            window.status = '';
+        }
+
+        function DelMainForm() {
+            window.status = 'delFunc_MainForm';
+            window.status = '';
+        }
+    </script>
+</head>
+
+<body>
+    <input type="button" value="나와라 델파이 TCallFunc 메시지" onclick='DelMessage()'>
+    <input type="button" value="나와라 델파이 TCallFunc 폼" onclick='DelForm()'>
+    <input type="button" value="나와라 델파이 메인 메시지" onclick='DelMainMessage()'>
+    <input type="button" value="나와라 델파이 메인 폼" onclick='DelMainForm()'>
+</body>
+</html>
