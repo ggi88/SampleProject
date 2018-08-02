@@ -1,0 +1,40 @@
+object FDownLoader: TFDownLoader
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'FDownLoader'
+  ClientHeight = 64
+  ClientWidth = 324
+  Color = clBtnFace
+  DoubleBuffered = True
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  PixelsPerInch = 96
+  TextHeight = 13
+  object gag: TProgressBar
+    Left = 0
+    Top = 0
+    Width = 324
+    Height = 64
+    Align = alClient
+    DoubleBuffered = True
+    ParentDoubleBuffered = False
+    Position = 50
+    Smooth = True
+    TabOrder = 0
+  end
+  object Timer1: TTimer
+    Interval = 100
+    OnTimer = Timer1Timer
+    Left = 136
+    Top = 8
+  end
+end
