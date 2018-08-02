@@ -22,7 +22,7 @@ begin
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  TStyleManager.TrySetStyle('Tablet Light');
+  TStyleManager.TrySetStyle('Light');
   Application.CreateForm(TDataModule1, DataModule1);
   Application.CreateForm(TFMain, FMain);
   Application.Run;
