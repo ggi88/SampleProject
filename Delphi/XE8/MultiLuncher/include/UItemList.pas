@@ -38,6 +38,8 @@ type
   private
     m_dictSensor: TDictionary<String,TSensorInfo>;
 
+    function CommaText: String;
+
     constructor Create;
   public
     destructor Destroy; override;
@@ -49,7 +51,7 @@ type
     procedure ImportConfig;
     procedure ExportConfig;
 
-    function Keys: TArray<String>;
+    function Keys(bSort: Boolean = False): TArray<String>;
     function Count: Integer;
     function Item(sKey: String): TSensorInfo;
 
@@ -79,6 +81,16 @@ begin
     m_dictSensor.Items[sKey].Free;
   for sKey in m_dictSensor.Keys do
     m_dictSensor.Remove(sKey);
+end;
+
+function TSensorList.CommaText: String;
+var
+  sKey: String;
+begin
+  Result := '';
+  for sKey in m_dictSensor.Keys do
+    Result := Result + sKey + ',';
+  Result := Copy(Result, 1, Length(Result) -1);
 end;
 
 function TSensorList.Count: Integer;
@@ -142,7 +154,7 @@ end;
 
 procedure TSensorList.ImportConfig;
 var
-  sData: String;
+  sIP, sData: String;
   i: Integer;
   l1, l2: TStringList;
 begin
@@ -165,6 +177,10 @@ begin
     if Trim(l1[i]) = '' then Continue;
 
     l2.DelimitedText := l1[i];
+
+    sIP := l2[0];
+    sIP := Copy(sIP, 1, Pos(':', sIP)-1);
+    if Pos(sIP, CommaText) > 0 then Continue;
 
     InsertOrUpdate(l2[0], l2[1], l2[2], l2[3]);
   end;
@@ -198,13 +214,25 @@ begin
   Result := m_dictSensor.Items[sKey];
 end;
 
-function TSensorList.Keys: TArray<String>;
+function TSensorList.Keys(bSort: Boolean): TArray<String>;
 var
+  SortKeys: TList<String>;
   sKey: String;
 begin
   Result := nil;
-  for sKey in m_dictSensor.Keys do
-    Insert(sKey, Result, 0);
+  if bSort then
+  begin
+    SortKeys := TList<String>.Create(m_dictSensor.Keys);
+    SortKeys.Sort; // deault ascending
+    for sKey in SortKeys do
+      Insert(sKey, Result, Length(Result));
+    SortKeys.Free;
+  end
+  else
+  begin
+    for sKey in m_dictSensor.Keys do
+      Insert(sKey, Result, Length(Result));
+  end;
 end;
 
 { TMyInfoList }

@@ -31,15 +31,16 @@ type
     m_sID: string;
     m_sPW: string;
     m_sDesc: String;
+    m_sSerial: String;
     m_dtLast: TDateTime;
     m_sSniperInfo, m_sLoginInfo, m_sInterLocking: string;
 
-    m_dict: TDictionary<String,String>;
-    m_sInstallPath, m_sListFile, m_sGUIVerion: String;
+    m_dictJS: TDictionary<String,String>;
+    m_listLicense: TStringList;
+    m_listModule: TStringList;
+    m_sGUIVerion: String;
 
     procedure ParserJS(sRst: AnsiString);
-
-    procedure GetSniperFilePath(sSubDir : string; var InstallPath : string; var ListFilePath : string);
 
     procedure SetIP(const Value: String);
     procedure SetID(const Value: String);
@@ -63,9 +64,6 @@ type
     function AddInterlockingIPS(sHostIP: String; sHostID: String; sHostDesc: string): Boolean;
     function AddInterlockingONE(sHostIP: String; sHostID: String; sHostDesc: string): Boolean;
 
-    function GetLocalInstallDir : string;
-    function GetProgramFilesDir : string;
-
     function GetLastResult: String;
     function GetLanguage: String;
     function GetDeviceType: String;
@@ -75,8 +73,11 @@ type
     function GetIP: String;
     function GetCommaText: string;
 
+    function GetSerial: Boolean;
+    function GetLicense: Boolean;
     function GetSensor: Boolean;
     function GetLogin: Boolean;
+    function GetLogout: Boolean;
     function GetLastTime: String;
 
   public
@@ -85,6 +86,7 @@ type
 
     procedure LoadSensor;
     procedure LoadLogin;
+    procedure LoadLogout;
     procedure InterLockingSensor(sHostIP: String; sHostID: String; sHostDesc: string);
 
     property IP: String read GetIP write SetIP;
@@ -96,6 +98,9 @@ type
     property LoginInfo: String read m_sLoginInfo;
     property InterLocking: String read m_sInterLocking;
     property CommaText: string read GetCommaText;
+    property ModuleList: TStringList read m_listModule;
+    property LicenseList: TStringList read m_listLicense;
+    property Serial: String read m_sSerial;
   end;
 
 implementation
@@ -168,13 +173,23 @@ end;
 constructor TSensorInfo.Create;
 begin
   inherited;
-  m_dict := TDictionary<String,String>.Create;
+  m_dictJS := TDictionary<String,String>.Create;
+  m_listLicense := TStringList.Create;
+  m_listLicense.StrictDelimiter := True;
+  m_listLicense.Delimiter := #$A;
+
+  m_listModule := TStringList.Create;
+  m_listModule.StrictDelimiter := True;
+  m_listModule.Delimiter := ';';
+
   m_dtLast := 0;
 end;
 
 destructor TSensorInfo.Destroy;
 begin
-  m_dict.Free;
+  m_dictJS.Free;
+  m_listLicense.Free;
+  m_listModule.Free;
 
   inherited;
 end;
@@ -312,82 +327,48 @@ begin
 
   nMin := MinutesBetween(Now, m_dtLast);
   if nMin = 0 then
-    Result := 'Newly'
+    Result := '최근'
+  else if nMin < 60 then
+    Result := IntToStr( nMin ) + ' 분전'
   else
-    Result := IntToStr( nMin ) + ' min ago';
+    Result := IntToStr( nMin div 60 ) + ' 시간전';
 end;
 
-function TSensorInfo.GetLocalInstallDir: string;
+function TSensorInfo.GetLicense: Boolean;
 var
-  Reg : TRegistry;
-  sTemp : String;
+  sUrl: String;
+  sPost, sRst: AnsiString;
 begin
-  Reg := TRegistry.Create;
-  try
-    Reg.RootKey := HKEY_LOCAL_MACHINE;
-    Reg.OpenKey('\Software\Microsoft\Windows\CurrentVersion\Uninstall\SniperLauncher', False);
-    sTemp := Reg.ReadString('Installpath');
+//2,13
+//name|use
+//Default IPS|1
+//DNS License|0
+//VoIP License|1
+//HTTPS License|1
+//RegEx License|0
+//RateLimit License|1
+//DDoS License|1
+//DHCP License|1
+//AR License|1
+//UR License|1
+//MR License|1
+//IPS Pattern License|1
+//Reputation License|1
 
-    if Pos('SNIPER_LAUNCHER', sTemp) >= 1 then
-    begin
-      Result := Copy(sTemp, 0, Length(sTemp) - Length('\SNIPER_LAUNCHER'));
-    end
-    else
-    begin
-      Result := '';
-    end;
-  finally
-    Reg.Free;
-  end;
-end;
+  Result := False;
 
-function TSensorInfo.GetProgramFilesDir: string;
-var
-  Reg : TRegistry;
-begin
-  Reg := TRegistry.Create;
-  try
-    Reg.RootKey := HKEY_LOCAL_MACHINE;
-    Reg.OpenKey('SOFTWARE\Microsoft\Windows\CurrentVersion', False);
-    Result := Reg.ReadString('ProgramFilesDir');
-  finally
-    Reg.Free;
-  end;
-end;
+  sPost := 'PRAGMA empty_result_callbacks=1; Select name, use from license_list where reg=1 order by code;';
+  sUrl := ToUrl('sniper.atx?cmd=config&order=config_sql_select&path=../config&dbname=sn_licenses&sqlsize=' + IntToStr(Length(sPost)));
 
-procedure TSensorInfo.GetSniperFilePath(sSubDir: string; var InstallPath,
-  ListFilePath: string);
-  function GetRootDir: String;
-  var
-    WindowDir : array[0..64] of char;
-  begin
-    GetWindowsDirectory(WindowDir,SizeOf(WindowDir));
-    Result := copy(WindowDir,1,3);     // Result will be "c:\"...
-  end;
+  if not HTTPSender.SendA(sUrl, sPost, sRst) then
+    Exit;
 
-const
-  CST_LIST_FILE_NAME = 'sniper.lst';
-var
-  sDir, sSniperDir, sTempInstallDir : string;
-begin
-  //reg에 installpath 값이 존재하면 해당 경로를 installpath로 지정 (#33445 [다수 고객사] Sniper Launcher 접속관련사항)
-  sTempInstallDir := GetLocalInstallDir;
-  if sTempInstallDir <> '' then
-  begin
-    //런처 설치 파일 경로 지정시 sniper 폴더 내에 생기지 않음으로 sniper 제거
-    sDir := StringReplace(Format('%s\', [sTempInstallDir]),'\\','\', [rfReplaceAll]);
-  end
-  else
-  begin
-    sDir := StringReplace(Format('%s\SNIPER\', [GetProgramFilesDir]),'\\','\', [rfReplaceAll]);
-  end;
+  Delete(sRst, 1, Pos(#10, String(sRst)));
+  Delete(sRst, 1, Pos(#10, String(sRst)));
+  sRst := AnsiString(StringReplace(String(sRst), '|', '=', [rfReplaceAll]));
+  m_listLicense.DelimitedText := String(sRst);
 
-  sSniperDir := StringReplace(Format('%s\%s',[sDir, sSubDir]),'\\','\',[rfReplaceAll]);
-
-  ForceDirectories(sSniperDir);
-
-  InstallPath := sSniperDir;
-  ListFilePath := StringReplace(Format('%s\%s', [sSniperDir, CST_LIST_FILE_NAME]), '\\', '\', [rfReplaceAll]);
+  Result := True;
 end;
 
 function TSensorInfo.GetToken(var sSrc: string; sDelim: string): String;
@@ -476,7 +457,21 @@ procedure TSensorInfo.LoadLogin;
 begin
   m_sLoginInfo := 'ㄱㄱ';
   if GetLogin then
-    m_sLoginInfo := 'ㅇㅋ'
+    m_sLoginInfo := '로그인ㅇㅋ'
+  else
+    m_sLoginInfo := 'ㄴㄴ';
+
+  GetSerial;
+  GetLicense;
+
+  m_dtLast := Now;
+end;
+
+procedure TSensorInfo.LoadLogout;
+begin
+  m_sLoginInfo := 'ㄱㄱ';
+  if GetLogout then
+    m_sLoginInfo := '로그아웃ㅇㅋ'
   else
     m_sLoginInfo := 'ㄴㄴ';
   m_dtLast := Now;
@@ -502,7 +497,7 @@ begin
   if (nIndex <> 0) then
   begin
     //접속 제한 IP임으로 화면에 표시
-    m_dict.AddOrSetValue('LAST_RESULT', '접속제한 IP');
+    m_dictJS.AddOrSetValue('LAST_RESULT', '접속제한 IP');
   end
   else
   begin
@@ -512,9 +507,32 @@ begin
     LoadSniperVersionJS;
     LoadSniperCFG;
     LoadVersionHTML;
-    m_dict.AddOrSetValue('LAST_RESULT', 'ㅇㅋ');
+    m_dictJS.AddOrSetValue('LAST_RESULT', 'ㅇㅋ');
   end;
 
+  Result := True;
+end;
+
+function TSensorInfo.GetSerial: Boolean;
+var
+  sUrl: String;
+  sPost, sRst: AnsiString;
+begin
+//1,1
+//subj_cn
+//SKRO4CWIT218796
+
+  Result := False;
+
+  sPost := 'PRAGMA empty_result_callbacks=1; Select subj_cn from cert_list;';
+  sUrl := ToUrl('sniper.atx?cmd=config&order=config_sql_select&path=../config&dbname=sn_licenses&sqlsize=' + IntToStr(Length(sPost)));
+
+  if not HTTPSender.SendA(sUrl, sPost, sRst) then
+    Exit;
+
+  Delete(sRst, 1, Pos(#10, String(sRst)));
+  Delete(sRst, 1, Pos(#10, String(sRst)));
+  m_sSerial := String(sRst);
   Result := True;
 end;
 
@@ -533,7 +551,6 @@ begin
   begin
     m_sSniperInfo := 'ㄴㄴ';
   end;
-
   m_dtLast := Now;
 end;
 
@@ -581,6 +598,9 @@ begin
     Exit;
 
   ParserJS(sRst);
+
+  m_listModule.Clear;
+  m_listModule.DelimitedText := ToValueDef('SNIPER_MODULE');
 
   Result := True;
 end;
@@ -634,23 +654,10 @@ begin
 end;
 
 function TSensorInfo.GetLogin: Boolean;
-const
-  STX = #2;     { Start Text(Total Data)  }
-  USG = #3;     { Start Usage             }
-  SAH = #4;     { Start Application Header}
-  STD = #5;     { Start Table Define      }
-  SFD = #6;     { Start Field Define      }
-  SRD = #7;     { Start Record Data       }
-  SAD = #8;     { Screen Attribute Data   }
-  LF  = #10;    { Line Feed               }
-  DLE = #16;    { Deliminator             }
 var
   sUrl: String;
   sRst: AnsiString;
-  sPath, sVersionDir, sType, temp : String;
-  sLoginResultString, sLoginCommandLine: string;
   sID, sPW : String;
-  l: TStringList;
 begin
   Result := False;
 
@@ -664,95 +671,22 @@ begin
   if not ContainsText(sRst, 'success') then
     Exit;
 
-  temp := String(Copy(sRst, pos(SAH, String(sRst))+1, length(sRst)));
-  sLoginResultString := temp;
+  Result := True;
+end;
 
-  //2004/08/17 skw : ADD - Param이 늘어난 경우와 기존의 경우 모두 사용가능하도록...
-  GetToken(temp,DLE);
-  temp := copy(temp,1,Length(temp)-1);  // delete tail character SAH
-  sLoginCommandLine := Format('SniperXLoader.exe "%s" "%s"',[m_sIP, StringReplace(temp,DLE,'" "',[rfReplaceAll])]);
+function TSensorInfo.GetLogout: Boolean;
+var
+  sUrl: String;
+  sRst: Ansistring;
+begin
+  Result := False;
 
-  DoSmartPointer(TObject(l), TStringList.Create);
-  l.StrictDelimiter := True;
-  l.Delimiter := #$10;
-  l.DelimitedText := sLoginResultString;
+  sUrl := ToURL(Format('Sniper.atx?ocx=%s?mode=%s?param=', ['logout', '1111']));
+  if not HttpSender.SendA(sUrl, '', sRst) then
+    Exit;
 
-  sType := GetDeviceType;
-  if (sType = 'ONE') or (sType = 'ONE-i') or (sType = 'ONE-d') then
-  begin
-    // 콘솔 설치 경로 변경 #41525
-    sVersionDir := StringReplace(ToValueDef('SNIPER_VER_ONE'), 'V', '', [rfReplaceAll]);
-
-    sVersionDir := Copy(sVersionDir, 0, Pos('.', sVersionDir) + 1);
-  end
-  else if (sType = 'IPS') then
-  begin
-    sVersionDir := StringReplace(ToValueDef('SNIPER_VER_ONE'), 'V', '', [rfReplaceAll]);
-  end
-  else if (sType = 'MIS') then
-  begin
-    sVersionDir := '2.0';
-  end
-  else if (sType = 'DDX') or (sType = 'DDXSensor') then
-  begin
-    sVersionDir := StringReplace(ToValueDef('SNIPER_VER_DDX'), 'V', '', [rfReplaceAll]);
-  end
-  else if (sType = 'IDS') then
-  begin
-    sVersionDir := StringReplace(ToValueDef('SNIPER_VER_IDS'), 'V', '', [rfReplaceAll]);
-  end
-  else
-  begin
-    sVersionDir := '';
-  end;
-
-  //gui_option.js 쓸때는 버전값 빈값으로 처리함. 2016.06.01 htw
-  if m_dict.ContainsKey('LoginTitle') then
-  begin
-    if m_dict.Items['LoginTitle'] <> '' then
-      sVersionDir := '';
-  end;
-
-  if (sType = 'ONE') then
-  begin
-    sPath := Format('SNIPER_ONE\%s\%s', [sVersionDir, m_sGUIVerion]);
-  end
-  else if (sType = 'ONE-i') then
-  begin
-    sPath := Format('SNIPERONE-i\%s\%s', [sVersionDir, m_sGUIVerion]);
-  end
-  else if (sType = 'ONE-d') then
-  begin
-    sPath := Format('SNIPERONE-d\%s\%s', [sVersionDir, m_sGUIVerion]);
-  end
-  else if (sType = 'IPS') then
-  begin
-    sPath := Format('SNIPER_IPS\%s\%s', [sVersionDir, m_sGUIVerion]);
-  end
-  else if (sType = 'DDX') or (sType = 'DDXSensor') then
-  begin
-    sPath := Format('SNIPER_DDX\%s\%s', [sVersionDir, m_sGUIVerion]);
-  end
-  else if (sType = 'MIS') then
-  begin
-    sPath := Format('SNIPER_MIS\%s\%s', [sVersionDir, m_sGUIVerion]);
-  end
-  else if (sType = 'IDS') then
-  begin
-    sPath := Format('SNIPER_IDS\%s\%s', [sVersionDir, m_sGUIVerion]);
-  end
-  else
-  begin
-    sPath := '';
-  end;
-
-  GetSniperFilePath(sPath, m_sInstallPath, m_sListFile);
-
-  if(l.Count > 0) then
-    l.Delete(0);
-  l.Insert(0, m_sIP);
-
-//  m_sParam := MakeParams(l);
+  if not ContainsText(sRst, 'success') then
+    Exit;
 
   Result := True;
 end;
@@ -763,7 +697,7 @@ var
   l: TStringList;
 begin
   sRst := System.AnsiStrings.StringReplace(sRst, ' ', '', [rfReplaceAll]);
-  sRst := System.AnsiStrings.StringReplace(sRst, ';', '', [rfReplaceAll]);
+  sRst := System.AnsiStrings.StringReplace(sRst, '";', '"', [rfReplaceAll]);
   sRst := System.AnsiStrings.StringReplace(sRst, 'var', '', [rfReplaceAll]);
   sRst := System.AnsiStrings.StringReplace(sRst, '"', '', [rfReplaceAll]);
 
@@ -774,8 +708,8 @@ begin
 
   for i := 0 to l.Count -1 do
   begin
-    if m_dict.ContainsKey(l.Names[i]) then Continue;
-    m_dict.AddOrSetValue(l.Names[i], l.Values[l.Names[i]]);
+    if m_dictJS.ContainsKey(l.Names[i]) then Continue;
+    m_dictJS.AddOrSetValue(l.Names[i], l.Values[l.Names[i]]);
   end;
 end;
 
@@ -821,8 +755,8 @@ end;
 
 function TSensorInfo.ToValueDef(sKey, sDef: String): String;
 begin
-  if m_dict.ContainsKey(sKey) then
-    Result := m_dict.Items[sKey]
+  if m_dictJS.ContainsKey(sKey) then
+    Result := m_dictJS.Items[sKey]
   else
     Result := sDef;
 end;

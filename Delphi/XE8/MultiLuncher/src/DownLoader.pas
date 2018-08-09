@@ -7,16 +7,18 @@ uses
 
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sGauge, WinHTTP_XE, Vcl.ComCtrls,
-  cabfiles, Vcl.ExtCtrls;
+  cabfiles, Vcl.ExtCtrls, Vcl.StdCtrls;
 
 type
   TFDownLoader = class(TForm)
     gag: TProgressBar;
     Timer1: TTimer;
+    btnRetry: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnRetryClick(Sender: TObject);
   private
     { Private declarations }
     m_sIP: String;
@@ -70,6 +72,11 @@ const
 {$R *.dfm}
 
 { TFDownLoader }
+
+procedure TFDownLoader.btnRetryClick(Sender: TObject);
+begin
+  Timer1Timer(Timer1);
+end;
 
 function TFDownLoader.CabFileNames(nIndex: Integer): String;
 begin
@@ -238,8 +245,11 @@ procedure TFDownLoader.Timer1Timer(Sender: TObject);
 var
   sPathSniperListOld, sPathSniperList, sPathSniperExe: String;
   nIdx: Integer;
+  b : Boolean;
 begin
   Timer1.Enabled := False;
+  b := False;
+  btnRetry.Visible := False;
   sPathSniperListOld := m_sDefaultPath + CST_OLD_FILE_LIST_FILE_NAME;
   sPathSniperList := m_sDefaultPath + CST_FILE_LIST_FILE_NAME;
   sPathSniperExe := m_sDefaultPath + CST_FILE_SNIPER_EXE;
@@ -300,9 +310,14 @@ begin
     end;
 
     gag.Position := 100;
+    gag.Refresh;
     ExecuteSniper(sPathSniperExe);
+    b := True;
   finally
-    close;
+    if b then
+      Close
+    else
+      btnRetry.Visible := True;
   end;
 end;
 

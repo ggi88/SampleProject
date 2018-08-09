@@ -14,6 +14,7 @@ object FDownLoader: TFDownLoader
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poOwnerFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -31,10 +32,20 @@ object FDownLoader: TFDownLoader
     Smooth = True
     TabOrder = 0
   end
+  object btnRetry: TButton
+    Left = 120
+    Top = 16
+    Width = 75
+    Height = 25
+    Caption = #51116#49884#51089
+    TabOrder = 1
+    Visible = False
+    OnClick = btnRetryClick
+  end
   object Timer1: TTimer
     Interval = 100
     OnTimer = Timer1Timer
-    Left = 136
+    Left = 40
     Top = 8
   end
 end

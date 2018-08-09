@@ -1,6 +1,7 @@
 object FMain: TFMain
   Left = 0
   Top = 0
+  ActiveControl = cbbFind
   Caption = 'FMain'
   ClientHeight = 664
   ClientWidth = 965
@@ -21,14 +22,14 @@ object FMain: TFMain
     Height = 506
     Cursor = crDefault
     Align = alClient
-    ColCount = 11
+    ColCount = 10
     DoubleBuffered = False
     DrawingStyle = gdsClassic
     FixedCols = 0
     RowCount = 2
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -12
     Font.Name = 'Tahoma'
     Font.Style = []
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing]
@@ -37,8 +38,10 @@ object FMain: TFMain
     PopupMenu = popGrid
     ScrollBars = ssBoth
     TabOrder = 1
+    OnSelectCell = grdSelectCell
     HoverRowCells = [hcNormal, hcSelected]
     OnClickCell = grdClickCell
+    OnDblClickCell = grdDblClickCell
     OnEditCellDone = grdEditCellDone
     OnEditChange = grdEditChange
     ActiveCellFont.Charset = DEFAULT_CHARSET
@@ -50,17 +53,16 @@ object FMain: TFMain
     Bands.Active = True
     Bands.PrimaryColor = clSilver
     ColumnHeaders.Strings = (
-      'no'
-      'desc'
-      'ip'
-      'id'
-      'pw'
-      'lasttime'
-      'healthcheck'
-      'login'
-      'interlocking'
-      'detecting'
-      'delete')
+      'No'
+      #48708#44256
+      'IP:Port'
+      'ID'
+      #48708#48128#48264#54840
+      #51025#45813#49884#44036
+      #50672#44208
+      #47196#44536#51064
+      #50672#46041#49444#51221
+      #49325#51228)
     ControlLook.FixedGradientFrom = clWhite
     ControlLook.FixedGradientTo = clBtnFace
     ControlLook.FixedGradientHoverFrom = 13619409
@@ -191,7 +193,7 @@ object FMain: TFMain
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        Header = 'no'
+        Header = 'No'
         HeaderAlignment = taCenter
         HeaderFont.Charset = DEFAULT_CHARSET
         HeaderFont.Color = clWindowText
@@ -238,7 +240,7 @@ object FMain: TFMain
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        Header = 'desc'
+        Header = #48708#44256
         HeaderAlignment = taCenter
         HeaderFont.Charset = DEFAULT_CHARSET
         HeaderFont.Color = clWindowText
@@ -281,11 +283,11 @@ object FMain: TFMain
         FilterCaseSensitive = False
         Fixed = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
+        Font.Color = clBlue
         Font.Height = -11
         Font.Name = 'Tahoma'
-        Font.Style = []
-        Header = 'ip'
+        Font.Style = [fsUnderline]
+        Header = 'IP:Port'
         HeaderAlignment = taCenter
         HeaderFont.Charset = DEFAULT_CHARSET
         HeaderFont.Color = clWindowText
@@ -332,7 +334,7 @@ object FMain: TFMain
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        Header = 'id'
+        Header = 'ID'
         HeaderAlignment = taCenter
         HeaderFont.Charset = DEFAULT_CHARSET
         HeaderFont.Color = clWindowText
@@ -357,7 +359,7 @@ object FMain: TFMain
         SpinMin = 0
         SpinStep = 1
         Tag = 0
-        Width = 100
+        Width = 80
       end
       item
         AutoMinSize = 0
@@ -379,7 +381,7 @@ object FMain: TFMain
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        Header = 'pw'
+        Header = #48708#48128#48264#54840
         HeaderAlignment = taCenter
         HeaderFont.Charset = DEFAULT_CHARSET
         HeaderFont.Color = clWindowText
@@ -426,7 +428,7 @@ object FMain: TFMain
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        Header = 'lasttime'
+        Header = #51025#45813#49884#44036
         HeaderAlignment = taCenter
         HeaderFont.Charset = DEFAULT_CHARSET
         HeaderFont.Color = clWindowText
@@ -473,7 +475,7 @@ object FMain: TFMain
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        Header = 'healthcheck'
+        Header = #50672#44208
         HeaderAlignment = taCenter
         HeaderFont.Charset = DEFAULT_CHARSET
         HeaderFont.Color = clWindowText
@@ -520,7 +522,7 @@ object FMain: TFMain
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        Header = 'login'
+        Header = #47196#44536#51064
         HeaderAlignment = taCenter
         HeaderFont.Charset = DEFAULT_CHARSET
         HeaderFont.Color = clWindowText
@@ -567,7 +569,7 @@ object FMain: TFMain
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        Header = 'interlocking'
+        Header = #50672#46041#49444#51221
         HeaderAlignment = taCenter
         HeaderFont.Charset = DEFAULT_CHARSET
         HeaderFont.Color = clWindowText
@@ -614,54 +616,7 @@ object FMain: TFMain
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        Header = 'detecting'
-        HeaderAlignment = taCenter
-        HeaderFont.Charset = DEFAULT_CHARSET
-        HeaderFont.Color = clWindowText
-        HeaderFont.Height = -11
-        HeaderFont.Name = 'Tahoma'
-        HeaderFont.Style = []
-        MinSize = 0
-        MaxSize = 0
-        Name = 'detecting'
-        Password = False
-        PrintBorders = [cbTop, cbLeft, cbRight, cbBottom]
-        PrintColor = clWhite
-        PrintFont.Charset = DEFAULT_CHARSET
-        PrintFont.Color = clWindowText
-        PrintFont.Height = -11
-        PrintFont.Name = 'Tahoma'
-        PrintFont.Style = []
-        ReadOnly = False
-        ShowBands = False
-        SortStyle = ssAutomatic
-        SpinMax = 0
-        SpinMin = 0
-        SpinStep = 1
-        Tag = 0
-        Width = 64
-      end
-      item
-        AutoMinSize = 0
-        AutoMaxSize = 0
-        Alignment = taLeftJustify
-        Borders = []
-        BorderPen.Color = clSilver
-        CheckFalse = 'N'
-        CheckTrue = 'Y'
-        Color = clWindow
-        ColumnPopupType = cpFixedCellsRClick
-        DropDownCount = 8
-        EditLength = 0
-        Editor = edNone
-        FilterCaseSensitive = False
-        Fixed = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        Header = 'delete'
+        Header = #49325#51228
         HeaderAlignment = taCenter
         HeaderFont.Charset = DEFAULT_CHARSET
         HeaderFont.Color = clWindowText
@@ -686,20 +641,19 @@ object FMain: TFMain
         SpinMin = 0
         SpinStep = 1
         Tag = 0
-        Width = 64
+        Width = 30
       end>
     ColWidths = (
       40
       100
       100
-      100
+      80
       100
       60
       200
       64
       64
-      64
-      64)
+      30)
   end
   object pnlMenu: TPanel
     Left = 0
@@ -739,7 +693,7 @@ object FMain: TFMain
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 185
+      Width = 150
       Height = 82
       Align = alLeft
       Caption = #45236' '#51221#48372
@@ -748,7 +702,7 @@ object FMain: TFMain
         AlignWithMargins = True
         Left = 5
         Top = 56
-        Width = 175
+        Width = 140
         Height = 13
         Align = alTop
         Caption = #49444#47749': '
@@ -759,7 +713,7 @@ object FMain: TFMain
         AlignWithMargins = True
         Left = 5
         Top = 37
-        Width = 175
+        Width = 140
         Height = 13
         Align = alTop
         Caption = 'ID:'
@@ -770,7 +724,7 @@ object FMain: TFMain
         AlignWithMargins = True
         Left = 5
         Top = 18
-        Width = 175
+        Width = 140
         Height = 13
         Align = alTop
         Caption = 'IP: '
@@ -778,52 +732,20 @@ object FMain: TFMain
         ExplicitWidth = 17
       end
     end
-    object GroupBox2: TGroupBox
-      AlignWithMargins = True
-      Left = 385
-      Top = 3
-      Width = 185
-      Height = 82
-      Align = alLeft
-      Caption = #53685#49888' '#51221#48372
-      TabOrder = 2
-      object Label2: TLabel
-        AlignWithMargins = True
-        Left = 5
-        Top = 37
-        Width = 175
-        Height = 13
-        Align = alTop
-        Caption = #49892#54056': 0'
-        Layout = tlCenter
-        ExplicitWidth = 35
-      end
-      object Label3: TLabel
-        AlignWithMargins = True
-        Left = 5
-        Top = 18
-        Width = 175
-        Height = 13
-        Align = alTop
-        Caption = #49457#44277': 0'
-        Layout = tlCenter
-        ExplicitWidth = 35
-      end
-    end
     object GroupBox3: TGroupBox
       AlignWithMargins = True
-      Left = 194
+      Left = 159
       Top = 3
-      Width = 185
+      Width = 150
       Height = 82
       Align = alLeft
-      Caption = #49468#49436' '#51221#48372
+      Caption = #49468#49436' '#47785#47197
       TabOrder = 1
       object lblTotalCount: TLabel
         AlignWithMargins = True
         Left = 5
         Top = 37
-        Width = 175
+        Width = 140
         Height = 13
         Align = alTop
         Caption = #51204#52404': 0'
@@ -834,12 +756,77 @@ object FMain: TFMain
         AlignWithMargins = True
         Left = 5
         Top = 18
-        Width = 175
+        Width = 140
         Height = 13
         Align = alTop
         Caption = #54788#51116': 0'
         Layout = tlCenter
         ExplicitWidth = 35
+      end
+    end
+    object grbModule: TGroupBox
+      AlignWithMargins = True
+      Left = 471
+      Top = 3
+      Width = 220
+      Height = 82
+      Align = alLeft
+      Caption = #47784#46280' '#51221#48372
+      TabOrder = 2
+      object lvwModule: TListView
+        Left = 2
+        Top = 15
+        Width = 216
+        Height = 65
+        Align = alClient
+        Columns = <>
+        ColumnClick = False
+        FlatScrollBars = True
+        TabOrder = 0
+        ViewStyle = vsList
+      end
+    end
+    object grbLicense: TGroupBox
+      AlignWithMargins = True
+      Left = 697
+      Top = 3
+      Width = 220
+      Height = 82
+      Align = alLeft
+      Caption = #46972#51060#49468#49828' '#51221#48372
+      TabOrder = 3
+      object lvwLicense: TListView
+        Left = 2
+        Top = 15
+        Width = 216
+        Height = 65
+        Align = alClient
+        Columns = <>
+        ColumnClick = False
+        FlatScrollBars = True
+        TabOrder = 0
+        ViewStyle = vsList
+      end
+    end
+    object grbSensor: TGroupBox
+      AlignWithMargins = True
+      Left = 315
+      Top = 3
+      Width = 150
+      Height = 82
+      Align = alLeft
+      Caption = #49468#49436' '#51221#48372
+      TabOrder = 4
+      object lblSerial: TLabel
+        AlignWithMargins = True
+        Left = 5
+        Top = 18
+        Width = 140
+        Height = 13
+        Align = alTop
+        Caption = #49884#47532#50620':'
+        Layout = tlCenter
+        ExplicitWidth = 37
       end
     end
   end
@@ -883,7 +870,6 @@ object FMain: TFMain
       Height = 35
       Action = actSensorInfo
       Align = alLeft
-      Caption = #50672#44208
       TabOrder = 2
     end
     object btnAddSensor: TButton
@@ -914,12 +900,12 @@ object FMain: TFMain
       OnExecute = actSettingExecute
     end
     object actLogin: TAction
-      Caption = #49468#49436' '#47196#44536#51064
+      Caption = #47196#44536#51064
       ImageIndex = 3
       OnExecute = actLoginExecute
     end
     object actSensorInfo: TAction
-      Caption = #49468#49436' '#51221#48372' '#54869#51064
+      Caption = #50672#44208
       ImageIndex = 2
       OnExecute = actSensorInfoExecute
     end
@@ -939,12 +925,16 @@ object FMain: TFMain
       OnExecute = actRestoreExecute
     end
     object actInterlocking: TAction
-      Caption = #49468#49436' '#50672#46041#49444#51221' '#52628#44032
+      Caption = #50672#46041#49444#51221' '#52628#44032
       OnExecute = actInterlockingExecute
     end
     object actExecute: TAction
-      Caption = #49468#49436' '#49892#54665
+      Caption = #49892#54665
       OnExecute = actExecuteExecute
+    end
+    object actLogout: TAction
+      Caption = #47196#44536#50500#50883
+      OnExecute = actLogoutExecute
     end
   end
   object popSetting: TPopupMenu
@@ -982,6 +972,9 @@ object FMain: TFMain
     object N1: TMenuItem
       Action = actLogin
     end
+    object N7: TMenuItem
+      Action = actLogout
+    end
     object N2: TMenuItem
       Action = actInterlocking
     end
@@ -994,6 +987,9 @@ object FMain: TFMain
     Top = 46
     object N4: TMenuItem
       Action = actLogin
+    end
+    object N8: TMenuItem
+      Action = actLogout
     end
     object N5: TMenuItem
       Action = actInterlocking

@@ -13,7 +13,8 @@ uses
   UItemList in 'include\UItemList.pas',
   DownLoader in 'src\DownLoader.pas' {FDownLoader},
   uMD5 in 'include\uMD5.pas',
-  USender in 'include\USender.pas';
+  USender in 'include\USender.pas',
+  Debuger in 'src\Debuger.pas' {FDebuger};
 
 {$R *.res}
 
@@ -25,5 +26,6 @@ begin
   TStyleManager.TrySetStyle('Light');
   Application.CreateForm(TDataModule1, DataModule1);
   Application.CreateForm(TFMain, FMain);
+  Application.CreateForm(TFDebuger, FDebuger);
   Application.Run;
 end.

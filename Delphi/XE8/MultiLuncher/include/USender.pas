@@ -102,7 +102,7 @@ begin
 
     with Stream as TMemoryStream do
     begin
-      SaveToFile(m_sPath);
+      SaveToFile(String(m_sPath));
     end;
   finally
     bLoad := False;
