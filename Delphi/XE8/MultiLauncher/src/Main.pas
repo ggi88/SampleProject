@@ -95,10 +95,13 @@ type
     m_listSensor: TSensorList;
     m_procStr: TProc<String>;
     m_bLoad: Boolean;
+
     procedure DisplayMyInfo;
     procedure DisplaySensor(sFilter: string = '');
     procedure DisplaySensorRow(sKey: string; nRow: Integer);
     procedure UpdateItemRow(ARow: Integer);
+
+    function CheckParams: Boolean;
   public
     { Public declarations }
   end;
@@ -298,6 +301,13 @@ begin
     cbbFind.Items.Add(cbbFind.Text);
 end;
 
+function TFMain.CheckParams: Boolean;
+begin
+  Result := ParamStr(1) = '1';
+  if not Result then
+    ShellExecute(Handle, 'open', 'Updater.exe', '', nil, SW_SHOWNORMAL);
+end;
+
 procedure TFMain.actRestoreExecute(Sender: TObject);
 begin
   m_listSensor.ImportConfig;
@@ -370,6 +380,9 @@ procedure TFMain.FormCreate(Sender: TObject);
 var
   sKey: String;
 begin
+  if not CheckParams then
+    Application.Terminate;
+
   Self.Caption := 'MultiLauncher';
   m_listMyInfo := TMyInfoList.GetObject;
   m_listSensor := TSensorList.GetObject;

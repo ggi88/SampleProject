@@ -88,8 +88,8 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <Icon_MainIcon>output\MultiLauncher.ico</Icon_MainIcon>
         <DCC_ExeOutput>.\output</DCC_ExeOutput>
-        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.9;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <VerInfo_Build>9</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.10;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Build>10</VerInfo_Build>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <ItemGroup>
@@ -122,9 +122,6 @@
         </DCCReference>
         <DCCReference Include="src\DownloadList.pas">
             <Form>FDownLoadList</Form>
-        </DCCReference>
-        <DCCReference Include="src\Update.pas">
-            <Form>FUpdate</Form>
         </DCCReference>
         <None Include="output\version.cfg"/>
         <BuildConfiguration Include="Release">
@@ -161,6 +158,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="output\version.cfg" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="output\version.cfg" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>

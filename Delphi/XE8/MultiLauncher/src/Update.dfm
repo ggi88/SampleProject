@@ -23,9 +23,9 @@ object FUpdate: TFUpdate
     Width = 318
     Height = 20
     Align = alBottom
+    Smooth = True
+    Style = pbstMarquee
     TabOrder = 0
-    ExplicitTop = 0
-    ExplicitWidth = 308
   end
   object mem: TMemo
     Left = 0
@@ -35,11 +35,9 @@ object FUpdate: TFUpdate
     Align = alClient
     ReadOnly = True
     TabOrder = 1
-    ExplicitTop = -44
-    ExplicitHeight = 75
   end
   object Timer1: TTimer
-    Interval = 500
+    Interval = 1500
     OnTimer = Timer1Timer
     Left = 136
     Top = 80

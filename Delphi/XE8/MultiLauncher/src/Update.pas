@@ -31,7 +31,7 @@ implementation
 {$R *.dfm}
 
 uses
-  UCommonFunc, USender;
+  UCommonFunc, USender, Winapi.ShellAPI;
 
 const
   CST_VERSION_FILE = 'version.cfg';
@@ -43,21 +43,21 @@ end;
 
 function TFUpdate.CompareVersion: Boolean;
 var
-  sUrl, sOutput: String;
+  sOutput: String;
+  sOutputA: AnsiString;
   sOnlineVersion, sOfflineVersion: String;
   l: TStringList;
 begin
   DoSmartPointer(TObject(l), TStringList.Create);
 
   // 버전 비교
-  CustomFileRead(CST_VERSION_FILE, TEncoding.UTF8, sOutput);
+  CustomFileRead(CST_VERSION_FILE, TEncoding.ANSI, sOutput);
   l.Text := sOutput;
   sOfflineVersion := l.Values['version'];
 
-  HTTPSender.Send(sUrl, '', sOutput);
-  l.Text := sOutput;
+  HTTPSender.SendA('https://github.com/ggi88/SampleProject/blob/master/Delphi/XE8/MultiLauncher/output/version.cfg?raw=true', '', sOutputA);
+  l.Text := String(sOutputA);
   sOnlineVersion := l.Values['version'];
-  sOnlineVersion := '1.0.0.8';
 
   Result := sOfflineVersion = sOnlineVersion;
 end;
@@ -73,28 +73,28 @@ begin
 end;
 
 procedure TFUpdate.Timer1Timer(Sender: TObject);
-var
-  sUrl: String;
 begin
   Timer1.Enabled := False;
   // 버전 비교
   if CompareVersion then
   begin
     // 버전 같을 시 그냥 실행
-    AddMemo('최신 확인');
-    ModalResult := mrOk;
+    AddMemo('최신 업데이트 확인');
   end
   else
   begin
-    // 버전 다를 시 다운로드
+    // 버전 다를 시 다운로드 후 실행
     AddMemo('업데이트 실행');
-    HTTPSender.Download(sUrl, '', 'MultiLauncher.exe');
+    HTTPSender.Download('https://github.com/ggi88/SampleProject/blob/master/Delphi/XE8/MultiLauncher/output/version.cfg?raw=true', '', CST_VERSION_FILE);
+    HTTPSender.Download('https://github.com/ggi88/SampleProject/blob/master/Delphi/XE8/MultiLauncher/output/MultiLauncher.exe?raw=true', '', 'MultiLauncher.exe');
     AddMemo('업데이트 완료');
-    AddMemo('종료 후 다시 시작해 주십시오');
-    ModalResult := mrCancel;
   end;
 
   Delay(1000);
+  AddMemo('프로그램 실행');
+  ShellExecute(Handle, 'open', 'MultiLauncher.exe', '1', nil, SW_SHOWNORMAL);
+  Delay(1000);
+  Close;
 end;
 
 end.
