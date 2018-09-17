@@ -3,7 +3,7 @@ object FMain: TFMain
   Top = 0
   ActiveControl = cbbFind
   Caption = 'FMain'
-  ClientHeight = 664
+  ClientHeight = 660
   ClientWidth = 965
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,9 +17,9 @@ object FMain: TFMain
   TextHeight = 13
   object grd: TAdvColumnGrid
     Left = 0
-    Top = 70
+    Top = 59
     Width = 965
-    Height = 506
+    Height = 457
     Cursor = crDefault
     Align = alClient
     ColCount = 10
@@ -118,7 +118,7 @@ object FMain: TFMain
     FixedFont.Name = 'Tahoma'
     FixedFont.Style = [fsBold]
     FloatFormat = '%.2f'
-    GridImages = DataModule1.imgGrid
+    GridImages = mdImage.imgGrid
     HoverButtons.Buttons = <>
     HoverButtons.Position = hbLeftFromColumnLeft
     MouseActions.CheckAllCheck = True
@@ -657,7 +657,7 @@ object FMain: TFMain
   end
   object pnlMenu: TPanel
     Left = 0
-    Top = 41
+    Top = 30
     Width = 965
     Height = 29
     Align = alTop
@@ -665,10 +665,12 @@ object FMain: TFMain
     TabOrder = 0
     object cbbFind: TComboBox
       AlignWithMargins = True
-      Left = 3
+      Left = 0
       Top = 3
-      Width = 959
+      Width = 965
       Height = 24
+      Margins.Left = 0
+      Margins.Right = 0
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -679,22 +681,24 @@ object FMain: TFMain
       TabOrder = 0
       OnChange = cbbFindChange
       OnKeyPress = cbbFindKeyPress
+      ExplicitLeft = 3
+      ExplicitWidth = 959
     end
   end
   object pnlInfo: TPanel
     Left = 0
-    Top = 576
+    Top = 516
     Width = 965
-    Height = 88
+    Height = 120
     Align = alBottom
-    BevelOuter = bvNone
     TabOrder = 2
+    Visible = False
     object GroupBox1: TGroupBox
       AlignWithMargins = True
-      Left = 3
-      Top = 3
+      Left = 4
+      Top = 28
       Width = 150
-      Height = 82
+      Height = 88
       Align = alLeft
       Caption = #45236' '#51221#48372
       TabOrder = 0
@@ -732,52 +736,20 @@ object FMain: TFMain
         ExplicitWidth = 17
       end
     end
-    object GroupBox3: TGroupBox
-      AlignWithMargins = True
-      Left = 159
-      Top = 3
-      Width = 150
-      Height = 82
-      Align = alLeft
-      Caption = #49468#49436' '#47785#47197
-      TabOrder = 1
-      object lblTotalCount: TLabel
-        AlignWithMargins = True
-        Left = 5
-        Top = 37
-        Width = 140
-        Height = 13
-        Align = alTop
-        Caption = #51204#52404': 0'
-        Layout = tlCenter
-        ExplicitWidth = 35
-      end
-      object lblCurrentCount: TLabel
-        AlignWithMargins = True
-        Left = 5
-        Top = 18
-        Width = 140
-        Height = 13
-        Align = alTop
-        Caption = #54788#51116': 0'
-        Layout = tlCenter
-        ExplicitWidth = 35
-      end
-    end
     object grbModule: TGroupBox
       AlignWithMargins = True
-      Left = 471
-      Top = 3
+      Left = 316
+      Top = 28
       Width = 220
-      Height = 82
+      Height = 88
       Align = alLeft
       Caption = #47784#46280' '#51221#48372
-      TabOrder = 2
+      TabOrder = 1
       object lvwModule: TListView
         Left = 2
         Top = 15
         Width = 216
-        Height = 65
+        Height = 71
         Align = alClient
         Columns = <>
         ColumnClick = False
@@ -788,18 +760,18 @@ object FMain: TFMain
     end
     object grbLicense: TGroupBox
       AlignWithMargins = True
-      Left = 697
-      Top = 3
+      Left = 542
+      Top = 28
       Width = 220
-      Height = 82
+      Height = 88
       Align = alLeft
       Caption = #46972#51060#49468#49828' '#51221#48372
-      TabOrder = 3
+      TabOrder = 2
       object lvwLicense: TListView
         Left = 2
         Top = 15
         Width = 216
-        Height = 65
+        Height = 71
         Align = alClient
         Columns = <>
         ColumnClick = False
@@ -810,13 +782,13 @@ object FMain: TFMain
     end
     object grbSensor: TGroupBox
       AlignWithMargins = True
-      Left = 315
-      Top = 3
+      Left = 160
+      Top = 28
       Width = 150
-      Height = 82
+      Height = 88
       Align = alLeft
       Caption = #49468#49436' '#51221#48372
-      TabOrder = 4
+      TabOrder = 3
       object lblSerial: TLabel
         AlignWithMargins = True
         Left = 5
@@ -829,12 +801,68 @@ object FMain: TFMain
         ExplicitWidth = 37
       end
     end
+    object Panel1: TPanel
+      Left = 1
+      Top = 1
+      Width = 963
+      Height = 24
+      Align = alTop
+      BevelOuter = bvNone
+      TabOrder = 4
+      object btnInfoClose: TSpeedButton
+        Left = 941
+        Top = 0
+        Width = 22
+        Height = 24
+        Align = alRight
+        Flat = True
+        Glyph.Data = {
+          36040000424D3604000000000000360000002800000010000000100000000100
+          2000000000000004000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000006A00000014000000000000000000000000000000000000
+          000000000000000000280000005A000000000000000000000000000000000000
+          0000000000000000000501010182000000140000000000000000000000000000
+          0000000000270000007600000000000000000000000000000000000000000000
+          0000000000000000000000000005010101820000001300000000000000000000
+          0027000000760000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000060101018200000013000000260000
+          0075000000000000000000000000000000000000000000000000000000000000
+          000000000000000000000000000000000000000000060101018B0000007D0000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000002700000078010101840000
+          0015000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000270000007600000000000000060101
+          0184000000150000000000000000000000000000000000000000000000000000
+          0000000000000000000000000027000000760000000000000000000000000000
+          0006010101840000001500000000000000000000000000000000000000000000
+          0000000000000000002600000075000000000000000000000000000000000000
+          0000000000060101018400000015000000000000000000000000000000000000
+          0000000000000000004A00000000000000000000000000000000000000000000
+          0000000000000000000600000046000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000}
+        OnClick = btnInfoClick
+        ExplicitLeft = 9
+        ExplicitTop = 2
+        ExplicitHeight = 22
+      end
+    end
   end
   object pnlMenubar: TPanel
     Left = 0
     Top = 0
     Width = 965
-    Height = 41
+    Height = 30
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 3
@@ -843,7 +871,7 @@ object FMain: TFMain
       Left = 887
       Top = 3
       Width = 75
-      Height = 35
+      Height = 24
       Align = alRight
       Caption = #49444#51221
       Style = bsSplitButton
@@ -855,7 +883,7 @@ object FMain: TFMain
       Left = 165
       Top = 3
       Width = 75
-      Height = 35
+      Height = 24
       Align = alLeft
       Caption = #51089#50629
       Style = bsSplitButton
@@ -867,7 +895,7 @@ object FMain: TFMain
       Left = 84
       Top = 3
       Width = 75
-      Height = 35
+      Height = 24
       Action = actSensorInfo
       Align = alLeft
       TabOrder = 2
@@ -877,10 +905,75 @@ object FMain: TFMain
       Left = 3
       Top = 3
       Width = 75
-      Height = 35
+      Height = 24
       Action = actAdd
       Align = alLeft
       TabOrder = 3
+    end
+  end
+  object pnlStatusBar: TPanel
+    Left = 0
+    Top = 636
+    Width = 965
+    Height = 24
+    Align = alBottom
+    BevelOuter = bvLowered
+    TabOrder = 4
+    object lblCount: TLabel
+      AlignWithMargins = True
+      Left = 939
+      Top = 4
+      Width = 22
+      Height = 16
+      Align = alRight
+      Caption = '0 / 0'
+      ExplicitHeight = 13
+    end
+    object btnInfo: TSpeedButton
+      Left = 1
+      Top = 1
+      Width = 22
+      Height = 22
+      Align = alLeft
+      Flat = True
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        2000000000000004000000000000000000000000000000000000000000000000
+        00000000000000000000000000240000006C0000008D00000094000000970000
+        008C0000006A0000002300000000000000000000000000000000000000000000
+        000000000000000000590000007E000000360000001500000000000000000000
+        0015000000350000007F00000057000000000000000000000000000000000000
+        00000000006B0000004D00000000000000000000000000000000000000000000
+        0000000000000000000000000050000000680000000000000000000000000000
+        005A0000004D0000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000500000005700000000000000250000
+        007C0000000000000000000000000000000000000000000000720000006E0000
+        0000000000000000000000000000000000000000007F000000230000006D0000
+        003200000000000000000000000000000000000000000000007C000000780000
+        000000000000000000000000000000000000000000350000006A0000008F0000
+        001300000000000000000000000000000000000000000000007C000000780000
+        000000000000000000000000000000000000000000150000008C000000940000
+        000000000000000000000000000000000000000000000000007C000000780000
+        0000000000000000000000000000000000000000000000000097000000910000
+        000000000000000000000000000000000000000000000000007C000000780000
+        00000000000000000000000000000000000000000000000000940000008F0000
+        0012000000000000000000000000000000000000000000000048000000450000
+        000000000000000000000000000000000000000000150000008D0000006E0000
+        0033000000000000000000000000000000000000000000000019000000180000
+        000000000000000000000000000000000000000000360000006C000000260000
+        007B000000000000000000000000000000000000000000000073000000700000
+        0000000000000000000000000000000000000000007E00000024000000000000
+        005C0000004B0000000000000000000000000000000000000000000000000000
+        00000000000000000000000000000000004D0000005900000000000000000000
+        00000000006E0000004B00000000000000000000000000000000000000000000
+        000000000000000000000000004D0000006B0000000000000000000000000000
+        0000000000000000005C0000007B000000330000001200000000000000000000
+        0013000000320000007C0000005A000000000000000000000000000000000000
+        00000000000000000000000000260000006E0000008F00000091000000940000
+        008F0000006D0000002500000000000000000000000000000000}
+      OnClick = btnInfoClick
+      ExplicitLeft = 0
+      ExplicitTop = 3
     end
   end
   object ActionList: TActionList
@@ -894,6 +987,7 @@ object FMain: TFMain
     object actDel: TAction
       Caption = #49468#49436' '#49325#51228
       ImageIndex = 1
+      OnExecute = actDelExecute
     end
     object actSetting: TAction
       Caption = #45236' '#51221#48372' '#49444#51221
@@ -980,6 +1074,12 @@ object FMain: TFMain
     end
     object N3: TMenuItem
       Action = actExecute
+    end
+    object N02: TMenuItem
+      Caption = '-'
+    end
+    object miDelete: TMenuItem
+      Action = actDel
     end
   end
   object popWorks: TPopupMenu

@@ -6,9 +6,10 @@ uses
   System.SysUtils, System.Classes, System.ImageList, Vcl.ImgList, Vcl.Controls;
 
 type
-  TDataModule1 = class(TDataModule)
+  TmdImage = class(TDataModule)
     imgButton: TImageList;
     imgGrid: TImageList;
+    imgStatus: TImageList;
   private
     { Private declarations }
   public
@@ -16,7 +17,7 @@ type
   end;
 
 var
-  DataModule1: TDataModule1;
+  mdImage: TmdImage;
 
 implementation
 

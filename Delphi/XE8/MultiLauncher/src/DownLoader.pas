@@ -12,19 +12,20 @@ uses
 type
   TFDownLoader = class(TForm)
     gag: TProgressBar;
-    Timer1: TTimer;
     btnRetry: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Timer1Timer(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnRetryClick(Sender: TObject);
   private
     { Private declarations }
+    m_bStatus: Boolean;
     m_sIP: String;
     m_sDefaultPath: String;
     m_nFileCount: Integer;
     m_ListFiles: TList;
+
+    procedure Init(sIP: String);
 
     procedure UnZip(sFile, sPath: String);
     procedure RemoveDirectoryAll(sPath: string);
@@ -36,16 +37,21 @@ type
     function DownloadFiles(sPath: String; nIndex: Integer): Boolean;
     function DownloadUnzipFiles(sPath: String; nIndex: Integer): Boolean;
 
+    function Download: Boolean;
+
     function GetFileNames(nIndex : Integer): String;
     function CabFileNames(nIndex : Integer): String;
     function GetFileNameExt(sFileName : String) : String;
   public
     { Public declarations }
-    procedure Init(sIP: String);
+    procedure Start;
+    property Status: Boolean read m_bStatus;
   end;
 
 //var
 //  FDownLoader: TFDownLoader;
+
+function ExecuteDownloader(sIP: String): TFDownLoader;
 
 implementation
 
@@ -71,11 +77,21 @@ const
 
 {$R *.dfm}
 
+function ExecuteDownloader(sIP: String): TFDownLoader;
+var
+  dl: TFDownLoader;
+begin
+  dl := TFDownLoader.Create(Application);
+  dl.Init(sIP);
+  Result := dl;
+end;
+
 { TFDownLoader }
 
 procedure TFDownLoader.btnRetryClick(Sender: TObject);
 begin
-  Timer1Timer(Timer1);
+  btnRetry.Visible := False;
+  Start;
 end;
 
 function TFDownLoader.CabFileNames(nIndex: Integer): String;
@@ -92,6 +108,78 @@ begin
   CustomFileRead(sPath2, TEncoding.Default, sRst2);
 
   Result := CompareStr(sRst1, sRst2) = 0
+end;
+
+function TFDownLoader.Download: Boolean;
+var
+  sPathSniperListOld, sPathSniperList, sPathSniperExe: String;
+  nIdx: Integer;
+begin
+  Result := False;
+
+  sPathSniperListOld := m_sDefaultPath + CST_OLD_FILE_LIST_FILE_NAME;
+  sPathSniperList := m_sDefaultPath + CST_FILE_LIST_FILE_NAME;
+  sPathSniperExe := m_sDefaultPath + CST_FILE_SNIPER_EXE;
+
+  gag.Position := 0;
+  // 경로 초기화
+  if not DirectoryExists(m_sDefaultPath) then
+  begin
+    if not ForceDirectories(m_sDefaultPath) then
+      Exit;
+  end;
+
+  if FileExists(sPathSniperList) then
+  begin
+    DeleteFile(sPathSniperListOld);
+    if not RenameFile(sPathSniperList, sPathSniperListOld) then Exit;
+
+    gag.Position := 20;
+    if not DownloadListFile(sPathSniperList) then Exit;
+
+    gag.Position := 40;
+    if not LoadListFile(sPathSniperList) then Exit;
+
+    gag.Position := 60;
+    if not CompareListFiles(sPathSniperList, sPathSniperListOld) then
+    begin
+      nIdx := 0;
+      while nIdx <> m_ListFiles.Count do
+      begin
+        DownloadFiles(m_sDefaultPath, nIdx);
+        DownloadUnzipFiles(m_sDefaultPath, nIdx);
+        Inc(nIdx);
+        gag.Position := gag.Position + 2;
+      end;
+    end;
+  end
+  else
+  begin
+    gag.Position := 20;
+    RemoveDirectoryAll(m_sDefaultPath);
+    if not ForceDirectories(m_sDefaultPath) then Exit;
+
+    gag.Position := 40;
+    if not DownloadListFile(sPathSniperList) then Exit;
+
+    gag.Position := 60;
+    if not LoadListFile(sPathSniperList) then Exit;
+
+    nIdx := 0;
+    while nIdx <> m_ListFiles.Count do
+    begin
+      DownloadFiles(m_sDefaultPath, nIdx);
+      DownloadUnzipFiles(m_sDefaultPath, nIdx);
+      Inc(nIdx);
+      gag.Position := gag.Position + 2;
+    end;
+  end;
+
+  gag.Position := 100;
+  ExecuteSniper(sPathSniperExe);
+
+  Delay(100);
+  Result := True;
 end;
 
 function TFDownLoader.DownloadFiles(sPath: String; nIndex: Integer): Boolean;
@@ -136,6 +224,7 @@ end;
 
 procedure TFDownLoader.FormCreate(Sender: TObject);
 begin
+  m_bStatus := True;
   m_ListFiles := TList.Create;
 end;
 
@@ -240,85 +329,11 @@ begin
    FindClose(SR);
 end;
 
-
-procedure TFDownLoader.Timer1Timer(Sender: TObject);
-var
-  sPathSniperListOld, sPathSniperList, sPathSniperExe: String;
-  nIdx: Integer;
-  b : Boolean;
+procedure TFDownLoader.Start;
 begin
-  Timer1.Enabled := False;
-  b := False;
-  btnRetry.Visible := False;
-  sPathSniperListOld := m_sDefaultPath + CST_OLD_FILE_LIST_FILE_NAME;
-  sPathSniperList := m_sDefaultPath + CST_FILE_LIST_FILE_NAME;
-  sPathSniperExe := m_sDefaultPath + CST_FILE_SNIPER_EXE;
-
-  try
-    gag.Position := 0;
-    // 경로 초기화
-    if not DirectoryExists(m_sDefaultPath) then
-    begin
-      if not ForceDirectories(m_sDefaultPath) then
-        Exit;
-    end;
-
-    if FileExists(sPathSniperList) then
-    begin
-      DeleteFile(sPathSniperListOld);
-      if not RenameFile(sPathSniperList, sPathSniperListOld) then Exit;
-
-      gag.Position := 20;
-      if not DownloadListFile(sPathSniperList) then Exit;
-
-      gag.Position := 40;
-      if not LoadListFile(sPathSniperList) then Exit;
-
-      gag.Position := 60;
-      if not CompareListFiles(sPathSniperList, sPathSniperListOld) then
-      begin
-        nIdx := 0;
-        while nIdx <> m_ListFiles.Count do
-        begin
-          DownloadFiles(m_sDefaultPath, nIdx);
-          DownloadUnzipFiles(m_sDefaultPath, nIdx);
-          Inc(nIdx);
-          gag.Position := gag.Position + 2;
-        end;
-      end;
-    end
-    else
-    begin
-      gag.Position := 20;
-      RemoveDirectoryAll(m_sDefaultPath);
-      if not ForceDirectories(m_sDefaultPath) then Exit;
-
-      gag.Position := 40;
-      if not DownloadListFile(sPathSniperList) then Exit;
-
-      gag.Position := 60;
-      if not LoadListFile(sPathSniperList) then Exit;
-
-      nIdx := 0;
-      while nIdx <> m_ListFiles.Count do
-      begin
-        DownloadFiles(m_sDefaultPath, nIdx);
-        DownloadUnzipFiles(m_sDefaultPath, nIdx);
-        Inc(nIdx);
-        gag.Position := gag.Position + 2;
-      end;
-    end;
-
-    gag.Position := 100;
-    gag.Refresh;
-    ExecuteSniper(sPathSniperExe);
-    b := True;
-  finally
-    if b then
-      Close
-    else
-      btnRetry.Visible := True;
-  end;
+  m_bStatus := Download;
+  btnRetry.Visible := not m_bStatus;
+  if m_bStatus then Close;
 end;
 
 procedure TFDownLoader.UnZip(sFile, sPath: String);

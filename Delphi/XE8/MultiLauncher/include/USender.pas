@@ -8,7 +8,7 @@ uses
   Winapi.Windows, Vcl.Forms, System.Classes, System.SysUtils;
 
 type
-  TSender = class(TObject)
+  TSender = class(TInterfacedObject)
   private
     bLoad: Boolean;
     m_sRst: String;
@@ -119,66 +119,74 @@ function TSender.Send(sUrl, sPost: String; var sRst: String): Boolean;
 var
   http: TWinHTTP;
 begin
+  Result := False;
   bLoad := True;
   m_sRst := '';
 
   DoSmartPointer(TObject(Http), TWinHTTP.Create(nil));
-  Http.AnsiMode := False;
-  Http.Timeouts.ConnectTimeout := 500;
-  Http.Timeouts.ReceiveTimeout := 500;
-  Http.Timeouts.SendTimeout := 500;
-  Http.OnDone := OnSenderDone;
-  Http.OnWaitTimeoutExpired := OnSenderWaitTimeoutExpired;
-  Http.OnHTTPError := OnSenderHTTPError;
-  Http.OnConnLost := OnSenderConnLost;
-  Http.OnAnyError := OnSenderAnyError;
-  Http.URL := sUrl;
-  Http.POSTData := UTF8String(sPost);
-  Http.Read(False);
-  while True do
-  begin
-    if (not bLoad) and (not http.Busy) then
-      Break;
+  try
+    Http.AnsiMode := False;
+    Http.Timeouts.ConnectTimeout := 500;
+    Http.Timeouts.ReceiveTimeout := 500;
+    Http.Timeouts.SendTimeout := 500;
+    Http.OnDone := OnSenderDone;
+    Http.OnWaitTimeoutExpired := OnSenderWaitTimeoutExpired;
+    Http.OnHTTPError := OnSenderHTTPError;
+    Http.OnConnLost := OnSenderConnLost;
+    Http.OnAnyError := OnSenderAnyError;
+    Http.URL := sUrl;
+    Http.POSTData := UTF8String(sPost);
+    Http.Read(False);
+    while True do
+    begin
+      if (not bLoad) and (not http.Busy) then
+        Break;
 
-    Application.ProcessMessages;
-    Sleep(1);
+      Delay(1);
+    end;
+
+    Result := Http.HTTPErrorCode = 200;
+    sRst := m_sRst;
+  except
+
   end;
-
-  Result := Http.HTTPErrorCode = 200;
-  sRst := m_sRst;
 end;
 
 function TSender.SendA(sUrl:String; sPost: AnsiString; var sRst: AnsiString): Boolean;
 var
   http: TWinHTTP;
 begin
+  Result := False;
   bLoad := True;
   m_sRstAnsi := '';
 
   DoSmartPointer(TObject(Http), TWinHTTP.Create(nil));
-  Http.AnsiMode := True;
-  Http.Timeouts.ConnectTimeout := 500;
-  Http.Timeouts.ReceiveTimeout := 500;
-  Http.Timeouts.SendTimeout := 500;
-  Http.OnDone := OnSenderDoneA;
-  Http.OnWaitTimeoutExpired := OnSenderWaitTimeoutExpired;
-  Http.OnHTTPError := OnSenderHTTPError;
-  Http.OnConnLost := OnSenderConnLost;
-  Http.OnAnyError := OnSenderAnyError;
-  Http.URL := sUrl;
-  Http.POSTDataA := sPost;
-  Http.Read(False);
-  while True do
-  begin
-    if (not bLoad) and (not http.Busy) then
-      Break;
+  try
+    Http.AnsiMode := True;
+    Http.Timeouts.ConnectTimeout := 500;
+    Http.Timeouts.ReceiveTimeout := 500;
+    Http.Timeouts.SendTimeout := 500;
+    Http.OnDone := OnSenderDoneA;
+    Http.OnWaitTimeoutExpired := OnSenderWaitTimeoutExpired;
+    Http.OnHTTPError := OnSenderHTTPError;
+    Http.OnConnLost := OnSenderConnLost;
+    Http.OnAnyError := OnSenderAnyError;
+    Http.URL := sUrl;
+    Http.POSTDataA := sPost;
+    Http.Read(False);
+    while True do
+    begin
+      if (not bLoad) and (not http.Busy) then
+        Break;
 
-    Application.ProcessMessages;
-    Sleep(1);
+      Delay(1);
+    end;
+
+    Result := Http.HTTPErrorCode = 200;
+    sRst := m_sRstAnsi;
+  except
+
   end;
-
-  Result := Http.HTTPErrorCode = 200;
-  sRst := m_sRstAnsi;
 end;
 
 function TSender.Download(sUrl: String; sPost: AnsiString;
@@ -186,23 +194,25 @@ function TSender.Download(sUrl: String; sPost: AnsiString;
 var
   http: TWinHTTP;
 begin
+  Result := False;
   bLoad := True;
   m_sPath := AnsiString(sPath);
   DoSmartPointer(TObject(Http), TWinHTTP.Create(nil));
-  Http.AnsiMode := True;
+  try
+    Http.AnsiMode := True;
 //  Http.CacheOptions := Http.CacheOptions + [coAlwaysReload, coPragmaNoCache, coNoCacheWrite];
-  Http.Timeouts.ConnectTimeout := 1000 * 10;
-  Http.Timeouts.ReceiveTimeout := 1000 * 10;
-  Http.Timeouts.SendTimeout := 1000 * 10;
-  Http.WaitTimeout := 1000 * 10;
-  Http.OnDone := OnSenderDoneDownload;
-  Http.OnWaitTimeoutExpired := OnSenderWaitTimeoutExpired;
-  Http.OnHTTPError := OnSenderHTTPError;
-  Http.OnConnLost := OnSenderConnLost;
-  Http.OnAnyError := OnSenderAnyError;
-  Http.URL := sUrl;
-  Http.POSTDataA := sPost;
-  Http.Read(True);
+    Http.Timeouts.ConnectTimeout := 1000 * 10;
+    Http.Timeouts.ReceiveTimeout := 1000 * 10;
+    Http.Timeouts.SendTimeout := 1000 * 10;
+    Http.WaitTimeout := 1000 * 10;
+    Http.OnDone := OnSenderDoneDownload;
+    Http.OnWaitTimeoutExpired := OnSenderWaitTimeoutExpired;
+    Http.OnHTTPError := OnSenderHTTPError;
+    Http.OnConnLost := OnSenderConnLost;
+    Http.OnAnyError := OnSenderAnyError;
+    Http.URL := sUrl;
+    Http.POSTDataA := sPost;
+    Http.Read(True);
 //  Http.Read(False);
 //  while True do
 //  begin
@@ -212,8 +222,10 @@ begin
 //    Application.ProcessMessages;
 //    Sleep(1);
 //  end;
+    Result := Http.HTTPErrorCode = 200;
+  except
 
-  Result := Http.HTTPErrorCode = 200;
+  end;
 end;
 
 procedure TSender.OnSenderAnyError(Sender: TObject);

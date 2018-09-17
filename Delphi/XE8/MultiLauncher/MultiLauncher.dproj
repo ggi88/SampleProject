@@ -5,7 +5,7 @@
         <FrameworkType>VCL</FrameworkType>
         <MainSource>MultiLauncher.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -88,10 +88,9 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <Icon_MainIcon>output\MultiLauncher.ico</Icon_MainIcon>
         <DCC_ExeOutput>.\output</DCC_ExeOutput>
-        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.3;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <VerInfo_Build>3</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.9;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Build>9</VerInfo_Build>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -99,34 +98,35 @@
         </DelphiCompile>
         <DCCReference Include="src\Main.pas">
             <Form>FMain</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="src\SenserEditor.pas">
             <Form>FSenserEditor</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="include\UCommonFunc.pas"/>
         <DCCReference Include="include\UItemInfo.pas"/>
         <DCCReference Include="include\UImage.pas">
-            <Form>DataModule1</Form>
-            <FormType>dfm</FormType>
+            <Form>mdImage</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="src\MyInfoEditor.pas">
             <Form>FMyInfoEditor</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="include\UItemList.pas"/>
         <DCCReference Include="src\DownLoader.pas">
             <Form>FDownLoader</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="include\uMD5.pas"/>
         <DCCReference Include="include\USender.pas"/>
         <DCCReference Include="src\Debuger.pas">
             <Form>FDebuger</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="src\DownloadList.pas">
+            <Form>FDownLoadList</Form>
+        </DCCReference>
+        <DCCReference Include="src\Update.pas">
+            <Form>FUpdate</Form>
+        </DCCReference>
+        <None Include="output\version.cfg"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -154,6 +154,18 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="1">
+                <DeployFile LocalName="output\MultiLauncher.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>MultiLauncher.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="output\version.cfg" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="output\MultiLauncher.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>MultiLauncher.exe</RemoteName>
@@ -536,13 +548,13 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
                 <Platform value="Win32">True</Platform>

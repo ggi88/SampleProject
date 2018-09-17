@@ -8,7 +8,7 @@ uses
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls,
   Vcl.ToolWin, Vcl.Grids, System.AnsiStrings, AdvObj, BaseGrid, AdvGrid,
   AdvCGrid, System.Actions, Vcl.ActnList, WinHTTP_XE, Vcl.Menus, Vcl.StdCtrls,
-  Vcl.Buttons, Vcl.ExtCtrls, System.ImageList, Vcl.ImgList;
+  Vcl.Buttons, Vcl.ExtCtrls, System.ImageList, Vcl.ImgList, System.UITypes;
 
 type
   TFMain = class(TForm)
@@ -35,9 +35,6 @@ type
     lblIP: TLabel;
     lblID: TLabel;
     GroupBox1: TGroupBox;
-    GroupBox3: TGroupBox;
-    lblTotalCount: TLabel;
-    lblCurrentCount: TLabel;
     popGrid: TPopupMenu;
     mt1: TMenuItem;
     N1: TMenuItem;
@@ -63,6 +60,13 @@ type
     lvwLicense: TListView;
     grbSensor: TGroupBox;
     lblSerial: TLabel;
+    N02: TMenuItem;
+    miDelete: TMenuItem;
+    pnlStatusBar: TPanel;
+    lblCount: TLabel;
+    btnInfo: TSpeedButton;
+    Panel1: TPanel;
+    btnInfoClose: TSpeedButton;
     procedure actAddExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure actBackupExecute(Sender: TObject);
@@ -83,11 +87,13 @@ type
     procedure actLogoutExecute(Sender: TObject);
     procedure grdSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure grdDblClickCell(Sender: TObject; ARow, ACol: Integer);
+    procedure actDelExecute(Sender: TObject);
+    procedure btnInfoClick(Sender: TObject);
   private
     { Private declarations }
     m_listMyInfo: TMyInfoList;
     m_listSensor: TSensorList;
-    m_procInt: TProc<Integer>;
+    m_procStr: TProc<String>;
     m_bLoad: Boolean;
     procedure DisplayMyInfo;
     procedure DisplaySensor(sFilter: string = '');
@@ -103,7 +109,7 @@ var
 implementation
 
 uses
-  SenserEditor, MyInfoEditor, Downloader, Winapi.ShellApi;
+  SenserEditor, MyInfoEditor, DownloadList, Winapi.ShellApi;
 
 {$R *.dfm}
 
@@ -123,10 +129,10 @@ begin
   DisplaySensor(cbbFind.Text);
 end;
 
-procedure TFMain.actExecuteExecute(Sender: TObject);
+procedure TFMain.actDelExecute(Sender: TObject);
 var
-  dl: TFDownLoader;
   arRows: TArray<Integer>;
+  sKey: String;
   i: Integer;
 begin
   grd.Enabled := False;
@@ -134,20 +140,43 @@ begin
   for i := 0 to grd.SelectedRowCount - 1 do
     Insert(grd.SelectedRow[i], arRows, 0);
 
+  if Length(arRows) > 1 then
+  begin
+    if MessageDlg('여러 개 삭제 ㄱㄱ?', mtWarning, [mbOK, mbCancel], 0) = mrCancel then
+    begin
+      grd.Enabled := True;
+      Exit;
+    end;
+  end;
+
   for i := 0 to Length(arRows) - 1 do
   begin
-    m_procInt :=
-      procedure(nRow: Integer)
+    sKey := grd.Cells[grd.ColumnByName['ip'].Index, arRows[i]];
+    m_listSensor.Delete(sKey);
+  end;
+  DisplaySensor(cbbFind.Text);
+  grd.Enabled := True;
+end;
+
+procedure TFMain.actExecuteExecute(Sender: TObject);
+var
+//  dl: TFDownLoader;
+  sKeys: TArray<String>;
+  i: Integer;
+begin
+  grd.Enabled := False;
+  sKeys := nil;
+  for i := 0 to grd.SelectedRowCount - 1 do
+    Insert(grd.Cells[grd.ColumnByName['ip'].Index, grd.SelectedRow[i]], sKeys, 0);
+
+  for i := 0 to Length(sKeys) - 1 do
+  begin
+    m_procStr :=
+      procedure(sKey: String)
       begin
-        SetTimeOut(
-          procedure
-          begin
-            dl := TFDownLoader.Create(Self);
-            dl.Init(grd.Cells[grd.ColumnByName['ip'].Index, nRow]);
-            dl.Show;
-          end);
+        SetTimeOut(procedure begin ExecuteDownloadList(sKey); end);
       end;
-    m_procInt(arRows[i]);
+    m_procStr(sKeys[i]);
   end;
 
   grd.Enabled := True;
@@ -155,28 +184,24 @@ end;
 
 procedure TFMain.actInterlockingExecute(Sender: TObject);
 var
-  arRows: TArray<Integer>;
+  sKeys: TArray<String>;
   i: Integer;
-  sKey: string;
 begin
   grd.Enabled := False;
-  arRows := nil;
+  sKeys := nil;
   for i := 0 to grd.SelectedRowCount - 1 do
-    Insert(grd.SelectedRow[i], arRows, 0);
+    Insert(grd.Cells[grd.ColumnByName['ip'].Index, grd.SelectedRow[i]], sKeys, 0);
 
-  for i := 0 to Length(arRows) - 1 do
+  for i := 0 to Length(sKeys) - 1 do
   begin
-    m_procInt :=
-      procedure(nRow: Integer)
+    m_procStr :=
+      procedure(sKey: String)
       begin
-        SetTimeOut(
-          procedure
-          begin
-            sKey := grd.Cells[grd.ColumnByName['ip'].Index, nRow];
-            m_listSensor.Item(sKey).InterLockingSensor(m_listMyInfo.Item(m_listMyInfo.Keys[0]).IP, m_listMyInfo.Item(m_listMyInfo.Keys[0]).ID, m_listMyInfo.Item(m_listMyInfo.Keys[0]).DESC);
-          end);
+        SetTimeOut(procedure begin m_listSensor.Item(sKey).InterLockingSensor(m_listMyInfo.Item(m_listMyInfo.Keys[0]).IP,
+                                                                              m_listMyInfo.Item(m_listMyInfo.Keys[0]).ID,
+                                                                              m_listMyInfo.Item(m_listMyInfo.Keys[0]).DESC); end);
       end;
-    m_procInt(arRows[i]);
+    m_procStr(sKeys[i]);
   end;
 
   grd.Enabled := True;
@@ -184,28 +209,22 @@ end;
 
 procedure TFMain.actLoginExecute(Sender: TObject);
 var
-  arRows: TArray<Integer>;
+  sKeys: TArray<String>;
   i: Integer;
-  sKey: string;
 begin
   grd.Enabled := False;
-  arRows := nil;
+  sKeys := nil;
   for i := 0 to grd.SelectedRowCount - 1 do
-    Insert(grd.SelectedRow[i], arRows, 0);
+    Insert(grd.Cells[grd.ColumnByName['ip'].Index, grd.SelectedRow[i]], sKeys, 0);
 
-  for i := 0 to Length(arRows) - 1 do
+  for i := 0 to Length(sKeys) - 1 do
   begin
-    m_procInt :=
-      procedure(nRow: Integer)
+    m_procStr :=
+      procedure(sKey: String)
       begin
-        SetTimeOut(
-          procedure
-          begin
-            sKey := grd.Cells[grd.ColumnByName['ip'].Index, nRow];
-            m_listSensor.Item(sKey).LoadLogin;
-          end);
+        SetTimeOut(procedure begin m_listSensor.Item(sKey).LoadLogin; end);
       end;
-    m_procInt(arRows[i]);
+    m_procStr(sKeys[i]);
   end;
 
   grd.Enabled := True;
@@ -213,28 +232,22 @@ end;
 
 procedure TFMain.actLogoutExecute(Sender: TObject);
 var
-  arRows: TArray<Integer>;
+  sKeys: TArray<String>;
   i: Integer;
-  sKey: string;
 begin
   grd.Enabled := False;
-  arRows := nil;
+  sKeys := nil;
   for i := 0 to grd.SelectedRowCount - 1 do
-    Insert(grd.SelectedRow[i], arRows, 0);
+    Insert(grd.Cells[grd.ColumnByName['ip'].Index, grd.SelectedRow[i]], sKeys, 0);
 
-  for i := 0 to Length(arRows) - 1 do
+  for i := 0 to Length(sKeys) - 1 do
   begin
-    m_procInt :=
-      procedure(nRow: Integer)
+    m_procStr :=
+      procedure(sKey: String)
       begin
-        SetTimeOut(
-          procedure
-          begin
-            sKey := grd.Cells[grd.ColumnByName['ip'].Index, nRow];
-            m_listSensor.Item(sKey).LoadLogout;
-          end);
+        SetTimeOut(procedure begin m_listSensor.Item(sKey).LoadLogout; end);
       end;
-    m_procInt(arRows[i]);
+    m_procStr(sKeys[i]);
   end;
 
   grd.Enabled := True;
@@ -242,28 +255,22 @@ end;
 
 procedure TFMain.actSensorInfoExecute(Sender: TObject);
 var
-  arRows: TArray<Integer>;
+  sKeys: TArray<String>;
   i: Integer;
-  sKey: string;
 begin
   grd.Enabled := False;
-  arRows := nil;
+  sKeys := nil;
   for i := 0 to grd.SelectedRowCount - 1 do
-    Insert(grd.SelectedRow[i], arRows, 0);
+    Insert(grd.Cells[grd.ColumnByName['ip'].Index, grd.SelectedRow[i]], sKeys, 0);
 
-  for i := 0 to Length(arRows) - 1 do
+  for i := 0 to Length(sKeys) - 1 do
   begin
-    m_procInt :=
-      procedure(nRow: Integer)
+    m_procStr :=
+      procedure(sKey: String)
       begin
-        SetTimeOut(
-          procedure
-          begin
-            sKey := grd.Cells[grd.ColumnByName['ip'].Index, nRow];
-            m_listSensor.Item(sKey).LoadSensor;
-          end);
+        SetTimeOut(procedure begin m_listSensor.Item(sKey).LoadSensor; end);
       end;
-    m_procInt(arRows[i]);
+    m_procStr(sKeys[i]);
   end;
 
   grd.Enabled := True;
@@ -354,13 +361,14 @@ begin
   end;
   grd.EndUpdate;
 
-  lblCurrentCount.Caption := '현재:' + #9 + IntToStr(grd.RowCount - 1);
-  lblTotalCount.Caption := '전체:' + #9 + IntToStr(m_listSensor.Count);
+  lblCount.Caption := Format('%d / %d ', [grd.RowCount - 1, m_listSensor.Count]);
 
   m_bLoad := False;
 end;
 
 procedure TFMain.FormCreate(Sender: TObject);
+var
+  sKey: String;
 begin
   Self.Caption := 'MultiLauncher';
   m_listMyInfo := TMyInfoList.GetObject;
@@ -411,6 +419,8 @@ var
   sKey: string;
   l: TStringList;
 begin
+  if not pnlInfo.Visible then Exit;
+
   sKey := grd.Cells[grd.ColumnByName['ip'].Index, ARow];
   l := m_listSensor.Item(sKey).ModuleList;
 
@@ -428,6 +438,15 @@ begin
   lvwLicense.Items.EndUpdate;
 
   lblSerial.Caption := '시리얼:' + #9 + m_listSensor.Item(sKey).Serial;
+end;
+
+procedure TFMain.btnInfoClick(Sender: TObject);
+begin
+  pnlInfo.Visible := not pnlInfo.Visible;
+  if pnlInfo.Visible then
+  begin
+    pnlStatusBar.Top := Self.Height;
+  end;
 end;
 
 procedure TFMain.btnSettingClick(Sender: TObject);

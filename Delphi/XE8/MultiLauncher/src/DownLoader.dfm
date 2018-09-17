@@ -1,11 +1,13 @@
 object FDownLoader: TFDownLoader
   Left = 0
   Top = 0
-  BorderIcons = [biSystemMenu]
-  BorderStyle = bsDialog
+  Align = alTop
+  AutoSize = True
+  BorderIcons = []
+  BorderStyle = bsSingle
   Caption = 'FDownLoader'
-  ClientHeight = 64
-  ClientWidth = 324
+  ClientHeight = 61
+  ClientWidth = 244
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -14,7 +16,6 @@ object FDownLoader: TFDownLoader
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poOwnerFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -23,17 +24,18 @@ object FDownLoader: TFDownLoader
   object gag: TProgressBar
     Left = 0
     Top = 0
-    Width = 324
-    Height = 64
+    Width = 244
+    Height = 61
     Align = alClient
     DoubleBuffered = True
     ParentDoubleBuffered = False
-    Position = 50
     Smooth = True
     TabOrder = 0
+    ExplicitWidth = 324
+    ExplicitHeight = 64
   end
   object btnRetry: TButton
-    Left = 120
+    Left = 72
     Top = 16
     Width = 75
     Height = 25
@@ -41,11 +43,5 @@ object FDownLoader: TFDownLoader
     TabOrder = 1
     Visible = False
     OnClick = btnRetryClick
-  end
-  object Timer1: TTimer
-    Interval = 100
-    OnTimer = Timer1Timer
-    Left = 40
-    Top = 8
   end
 end

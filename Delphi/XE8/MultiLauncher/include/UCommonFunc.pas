@@ -3,7 +3,8 @@ unit UCommonFunc;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Generics.Collections, System.RegularExpressions;
+  System.SysUtils, System.Classes, System.Generics.Collections,
+  System.RegularExpressions, Vcl.Forms;
 
 {** Thread를 이용한 비동기 콜백
 * UI동기 없이 지연가능한 함수 활용을 위해 작성
@@ -44,6 +45,9 @@ function IsValidIPv4(ip: String): Boolean;
 // sql String
 function ToQuotes(text: String = ''): String;
 
+// async delay
+procedure Delay(dwMilliseconds: Cardinal);
+
 implementation
 
 uses
@@ -67,12 +71,12 @@ procedure SetTimeOut(proc: TProc; nInterval: Integer);
 begin
   TThread.CreateAnonymousThread( procedure
     begin
-    Sleep(nInterval);
+      Sleep(nInterval);
 
-    TThread.Synchronize( TThread.CurrentThread, procedure
-      begin
-        proc
-      end);
+      TThread.Synchronize( TThread.CurrentThread, procedure
+        begin
+          proc
+        end);
     end).Start;
 end;
 
@@ -171,6 +175,18 @@ function ToQuotes(text: String): String;
 begin
   Result := '''' + text + '''';
 end;
+
+procedure Delay(dwMilliseconds: Cardinal);
+var
+  iStart, iStop: Cardinal;
+begin
+  iStart := TThread.GetTickCount;
+  repeat
+    iStop := TThread.GetTickCount;
+    Application.ProcessMessages;
+  until (iStop - iStart) >= dwMilliseconds;
+end;
+
 
 { TMyTask }
 
