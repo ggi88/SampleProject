@@ -90,7 +90,9 @@ begin
   end;
 
   if m_Dict.Count <= m_nIndex then
+  begin
     Exit;
+  end;
 
   try
     m_Dict.Items[m_Dict.Keys.ToArray[m_nIndex]].Start;

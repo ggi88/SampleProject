@@ -67,6 +67,8 @@ type
     btnInfo: TSpeedButton;
     Panel1: TPanel;
     btnInfoClose: TSpeedButton;
+    N9: TMenuItem;
+    N10: TMenuItem;
     procedure actAddExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure actBackupExecute(Sender: TObject);

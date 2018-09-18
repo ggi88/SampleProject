@@ -27,8 +27,6 @@ object FDownLoadList: TFDownLoadList
     Height = 351
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 262
-    ExplicitHeight = 462
   end
   object pnlCount: TPanel
     Left = 0
@@ -40,7 +38,6 @@ object FDownLoadList: TFDownLoadList
     BevelOuter = bvNone
     Caption = '0'
     TabOrder = 1
-    ExplicitTop = 330
   end
   object Timer1: TTimer
     Interval = 500

@@ -681,8 +681,6 @@ object FMain: TFMain
       TabOrder = 0
       OnChange = cbbFindChange
       OnKeyPress = cbbFindKeyPress
-      ExplicitLeft = 3
-      ExplicitWidth = 959
     end
   end
   object pnlInfo: TPanel
@@ -1096,6 +1094,12 @@ object FMain: TFMain
     end
     object N6: TMenuItem
       Action = actExecute
+    end
+    object N9: TMenuItem
+      Caption = '-'
+    end
+    object N10: TMenuItem
+      Action = actDel
     end
   end
 end

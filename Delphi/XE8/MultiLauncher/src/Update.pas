@@ -55,7 +55,7 @@ begin
   l.Text := sOutput;
   sOfflineVersion := l.Values['version'];
 
-  HTTPSender.SendA('https://github.com/ggi88/SampleProject/blob/master/Delphi/XE8/MultiLauncher/output/version.cfg?raw=true', '', sOutputA);
+  HTTPSender.SendA('https://raw.githubusercontent.com/ggi88/SampleProject/master/Delphi/XE8/MultiLauncher/output/version.cfg', '', sOutputA);
   l.Text := String(sOutputA);
   sOnlineVersion := l.Values['version'];
 
@@ -85,8 +85,8 @@ begin
   begin
     // 버전 다를 시 다운로드 후 실행
     AddMemo('업데이트 실행');
-    HTTPSender.Download('https://github.com/ggi88/SampleProject/blob/master/Delphi/XE8/MultiLauncher/output/version.cfg?raw=true', '', CST_VERSION_FILE);
-    HTTPSender.Download('https://github.com/ggi88/SampleProject/blob/master/Delphi/XE8/MultiLauncher/output/MultiLauncher.exe?raw=true', '', 'MultiLauncher.exe');
+    HTTPSender.Download('https://raw.githubusercontent.com/ggi88/SampleProject/master/Delphi/XE8/MultiLauncher/output/version.cfg', '', CST_VERSION_FILE);
+    HTTPSender.Download('https://github.com/ggi88/SampleProject/raw/master/Delphi/XE8/MultiLauncher/output/MultiLauncher.exe', '', 'MultiLauncher.exe');
     AddMemo('업데이트 완료');
   end;
 
