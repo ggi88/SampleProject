@@ -10,6 +10,9 @@ uses
   cabfiles, Vcl.ExtCtrls, Vcl.StdCtrls;
 
 type
+  TDownloadStatus = (dsNone, dsSuccess, dsFail);
+
+type
   TFDownLoader = class(TForm)
     gag: TProgressBar;
     btnRetry: TButton;
@@ -19,7 +22,7 @@ type
     procedure btnRetryClick(Sender: TObject);
   private
     { Private declarations }
-    m_bStatus: Boolean;
+    m_Status: TDownloadStatus;
     m_sIP: String;
     m_sDefaultPath: String;
     m_nFileCount: Integer;
@@ -37,7 +40,7 @@ type
     function DownloadFiles(sPath: String; nIndex: Integer): Boolean;
     function DownloadUnzipFiles(sPath: String; nIndex: Integer): Boolean;
 
-    function Download: Boolean;
+    function Download: TDownloadStatus;
 
     function GetFileNames(nIndex : Integer): String;
     function CabFileNames(nIndex : Integer): String;
@@ -45,7 +48,7 @@ type
   public
     { Public declarations }
     procedure Start;
-    property Status: Boolean read m_bStatus;
+    property Status: TDownloadStatus read m_Status;
   end;
 
 //var
@@ -91,7 +94,7 @@ end;
 procedure TFDownLoader.btnRetryClick(Sender: TObject);
 begin
   btnRetry.Visible := False;
-  Start;
+  m_Status := dsNone;
 end;
 
 function TFDownLoader.CabFileNames(nIndex: Integer): String;
@@ -110,12 +113,12 @@ begin
   Result := CompareStr(sRst1, sRst2) = 0
 end;
 
-function TFDownLoader.Download: Boolean;
+function TFDownLoader.Download: TDownloadStatus;
 var
   sPathSniperListOld, sPathSniperList, sPathSniperExe: String;
   nIdx: Integer;
 begin
-  Result := False;
+  Result := dsFail;
 
   sPathSniperListOld := m_sDefaultPath + CST_OLD_FILE_LIST_FILE_NAME;
   sPathSniperList := m_sDefaultPath + CST_FILE_LIST_FILE_NAME;
@@ -179,7 +182,7 @@ begin
   ExecuteSniper(sPathSniperExe);
 
   Delay(100);
-  Result := True;
+  Result := dsSuccess;
 end;
 
 function TFDownLoader.DownloadFiles(sPath: String; nIndex: Integer): Boolean;
@@ -224,7 +227,7 @@ end;
 
 procedure TFDownLoader.FormCreate(Sender: TObject);
 begin
-  m_bStatus := True;
+  m_Status := dsNone;
   m_ListFiles := TList.Create;
 end;
 
@@ -331,9 +334,9 @@ end;
 
 procedure TFDownLoader.Start;
 begin
-  m_bStatus := Download;
-  btnRetry.Visible := not m_bStatus;
-  if m_bStatus then Close;
+  m_Status := Download;
+  btnRetry.Visible := m_Status = dsFail;
+  if m_Status = dsSuccess then Close;
 end;
 
 procedure TFDownLoader.UnZip(sFile, sPath: String);

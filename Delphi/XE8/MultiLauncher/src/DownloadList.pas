@@ -71,6 +71,9 @@ procedure TFDownLoadList.FormDestroy(Sender: TObject);
 var
   sKey: String;
 begin
+  Timer1.Enabled := False;
+  Delay(500);
+
   for sKey in m_Dict.Keys do
     m_Dict.Items[sKey].Close;
   m_Dict.Clear;
@@ -89,21 +92,17 @@ begin
     Close;
   end;
 
-  if m_Dict.Count <= m_nIndex then
-  begin
-    Exit;
-  end;
+  if m_Dict.Count = m_nIndex then
+    m_nIndex := 0;
 
   try
-    m_Dict.Items[m_Dict.Keys.ToArray[m_nIndex]].Start;
-    if m_Dict.Items[m_Dict.Keys.ToArray[m_nIndex]].Status then
-    begin
-      m_Dict.Remove(m_Dict.Keys.ToArray[m_nIndex]);
-    //    m_nIndex := 0;
-    end
-    else
-    begin
-      Inc(m_nIndex);
+    case m_Dict.Items[m_Dict.Keys.ToArray[m_nIndex]].Status of
+      dsNone:
+        m_Dict.Items[m_Dict.Keys.ToArray[m_nIndex]].Start;
+      dsSuccess:
+        m_Dict.Remove(m_Dict.Keys.ToArray[m_nIndex]);
+      dsFail:
+        Inc(m_nIndex);
     end;
   except
     //
